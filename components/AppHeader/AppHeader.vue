@@ -1,10 +1,12 @@
 
 
 <template>
+  <header class="w-full h-16 bg-slate-50">
+
     <nav
       class="flex items-center justify-between flex-wrap w-full h-full"
     >
-      <div class="flex items-center flex-shrink-0 text-white px-4">
+      <div class="flex items-center flex-shrink-0 text-slate-600 px-4">
         <nuxt-img
           class="h-8 w-8 mr-2"
           src="https://placehold.co/80x80"
@@ -21,6 +23,7 @@
         </div>
       </div>
     </nav>
+  </header>
 </template>
 
 <script setup lang="ts">

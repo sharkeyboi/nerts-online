@@ -1,5 +1,5 @@
 <template>
-    <div  @click="Deal" :class="`border-2 w-24 h-32 cursor-pointer select-none ${modelValue.length > 0 ? 'bg-slate-800':''}`">
+    <div  @click="Deal" :class="`border-4 border-slate-700 w-24 h-32 cursor-pointer select-none ${modelValue.length > 0 ? 'bg-slate-500':''}`">
 
     </div>
 </template>

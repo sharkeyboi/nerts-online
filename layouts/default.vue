@@ -1,14 +1,12 @@
 <template>
-  <div class="flex flex-col w-full h-screen overflow-hidden bg-slate-50">
-    <header class="w-full h-16 bg-slate-800">
+  <div class="flex flex-col w-full h-screen bg-slate-50 align-middle">
       <AppHeader />
-    </header>
-    <main class="flex-grow w-full h-full p-4 mx-auto max-w-7xl">
+    <main class="flex-grow h-full p-4 bg-slate-200 flex justify-center">
       <slot/>
     </main>
         <footer class="flex items-center justify-center w-full h-16 text-black">
         <p class="text-gray-700">
-          My Nuxt App &copy; {{ new Date().getFullYear() }}
+          Nerts Online &copy; {{ new Date().getFullYear() }}
         </p>
     </footer>
 

@@ -1,5 +1,5 @@
 <template>
-    <NuxtLink :to="route" class="text-slate-50 mx-4 text-center" :active-class="`${activeclass} border-b-2`">
+    <NuxtLink :to="route" class="text-slate-500 mx-4 text-center hover:text-primary-600" active-class="!text-primary-700">
     <slot/>
     </NuxtLink>
 </template>

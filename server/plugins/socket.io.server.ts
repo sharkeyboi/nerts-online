@@ -1,10 +1,13 @@
 import { Server, Socket } from 'socket.io'
-import { DefaultEventsMap } from 'socket.io/dist/typed-events'
+import type { DefaultEventsMap } from 'socket.io/dist/typed-events'
 import {v4} from 'uuid'
-import { DropAction, LocationType } from '~/src/types/actions'
-import { GameBoard, UserSide } from '~/src/types/board'
-import { Card } from '~/src/types/card'
-import { ClientToServerEvents, ServerToClientEvents } from '~/src/types/socketMessages'
+import { validateRiverDrop } from '~/src/serverDropHandlers'
+import type { DropAction} from '~/src/types/actions'
+import { LocationType } from '~/src/types/actions'
+import type { GameBoard, UserSide } from '~/src/types/board'
+import type { Card } from '~/src/types/card'
+import type { ClientToServerEvents, ServerToClientEvents } from '~/src/types/socketMessages'
+import { cartesian, numbers, suits } from '~/src/utils/cardData'
 import { shuffle } from '~/src/utils/shuffle'
 const MAX_USERS = 2
 type Room = {
@@ -14,10 +17,6 @@ type Room = {
 }
 
 
-const cartesian =
-  (...a:any[]) => a.reduce((a, b) => a.flatMap((d: any) => b.map((e: any) => [d, e].flat())));
-const numbers = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
-const suits = ["♠️","♣️","♦️","♥️"]
 const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
     return {
         number: elem[0],
@@ -56,7 +55,7 @@ export default defineNitroPlugin((nitroApp) => {
      
 })
 
-function handleDropAction(room: Room, dropAction: DropAction): Boolean{
+function handleDropAction(room: Room, dropAction: DropAction): boolean{
     switch(dropAction.toLocation.locationType) {
         case(LocationType.Lake):
             if(validateLakeDrop(room, dropAction)) {
@@ -64,11 +63,17 @@ function handleDropAction(room: Room, dropAction: DropAction): Boolean{
                 return true
             }
             break;
+        case(LocationType.River):
+            const riverPile = room.gameBoard?.usersides[dropAction.userId].riverStacks[dropAction.toLocation.index]
+            if(!riverPile) return false;
+            if(validateRiverDrop(riverPile, dropAction)) {
+                //room = handleRiverDrop(room, dropAction)
+            }
     }
     return false
 }
 
-function validateLakeDrop(room: Room, lakeDropAction: DropAction): Boolean {
+function validateLakeDrop(room: Room, lakeDropAction: DropAction): boolean {
     const lakePile = room.gameBoard?.lake[lakeDropAction.toLocation.index]
     if(lakeDropAction.cards.length != 1) return false
     const currCard = lakeDropAction.cards[0]

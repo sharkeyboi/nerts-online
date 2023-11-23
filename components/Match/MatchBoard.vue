@@ -18,7 +18,7 @@
                 <MatchDeck class="mx-4" v-model="playerDeck" />
                 <MatchStack :cards="playerCurrCards"/>
             </div>
-            <MatchRiverStack :cards="cards" v-for="(cards,index) in playerRiver" :key="index" :index="index"/>
+            <MatchRiverStack @drop="serverHandleRiverDrop($event, index)" :cards="cards" v-for="(cards,index) in playerRiver" :key="index" :index="index"/>
         </div>
     </div>
 </template>
@@ -69,8 +69,36 @@ $io.on('dropResponse', (dropResponse: DropResponse) => {
         case(LocationType.Lake):
             clientHandleLakeDrop(dropResponse)
             break;
+        case(LocationType.River):
+            clientHandleRiverDrop(dropResponse)
+            break;
     }
 })
+
+function clientHandleRiverDrop(dropResponse: DropResponse) {
+    if(dropResponse.userId == username.value) {
+        const dropTo = playerRiver.value[dropResponse.toLocation.index]
+        dropResponse.cards.forEach((card) => {
+            dropTo.push(card)
+        })
+        const dropFrom = playerRiver.value[dropResponse.fromLocation.index]
+        dropResponse.cards.forEach((card) => {
+            dropFrom.splice(dropFrom.indexOf(card),1)
+        })
+    }
+}
+
+function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number) {
+    $io.emit('dropAction', {
+        userId: username.value,
+        cards: clientDragAction.cards,
+        toLocation: {
+            locationType: LocationType.River,
+            index: index
+        },
+        fromLocation: clientDragAction.fromLocation
+    })
+}
 
 function clientHandleLakeDrop(dropResponse: DropResponse) {
     dropResponse.cards.forEach((card) => {
@@ -83,6 +111,8 @@ function clientHandleLakeDrop(dropResponse: DropResponse) {
         })
     }
 }
+
+
 
 function serverHandleLakeDrop(clientDragAction: ClientDragAction, index: number) {
     $io.emit('dropAction', {

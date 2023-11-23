@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import type { DefaultEventsMap } from 'socket.io/dist/typed-events'
 import {v4} from 'uuid'
+import { validateLakeDrop } from '~/src/serverDropHandlers'
 import { validateRiverDrop } from '~/src/serverDropHandlers'
 import type { DropAction} from '~/src/types/actions'
 import { LocationType } from '~/src/types/actions'
@@ -58,7 +59,9 @@ export default defineNitroPlugin((nitroApp) => {
 function handleDropAction(room: Room, dropAction: DropAction): boolean{
     switch(dropAction.toLocation.locationType) {
         case(LocationType.Lake):
-            if(validateLakeDrop(room, dropAction)) {
+            const lakePile = room.gameBoard?.lake[dropAction.toLocation.index]
+            if(!lakePile) return false
+            if(validateLakeDrop(lakePile, dropAction.cards)) {
                 room = handleLakeDrop(room, dropAction)
                 return true
             }
@@ -66,28 +69,11 @@ function handleDropAction(room: Room, dropAction: DropAction): boolean{
         case(LocationType.River):
             const riverPile = room.gameBoard?.usersides[dropAction.userId].riverStacks[dropAction.toLocation.index]
             if(!riverPile) return false;
-            if(validateRiverDrop(riverPile, dropAction)) {
+            if(validateRiverDrop(riverPile, dropAction.cards)) {
                 //room = handleRiverDrop(room, dropAction)
             }
     }
     return false
-}
-
-function validateLakeDrop(room: Room, lakeDropAction: DropAction): boolean {
-    const lakePile = room.gameBoard?.lake[lakeDropAction.toLocation.index]
-    if(lakeDropAction.cards.length != 1) return false
-    const currCard = lakeDropAction.cards[0]
-
-    if(!lakePile) return false
-    if(lakePile.length == 0) {
-        if(currCard.number != numbers[0]) return false // If the pile is empty, have to put an Ace here
-    }
-    else {
-        const topLake = lakePile[lakePile.length]
-        if(currCard.suit != topLake.suit) return false // Has to match suit
-        if(currCard.number != numbers[numbers.indexOf(topLake.number) + 1]) return false // Has to be one number higher
-    }
-    return true
 }
 
 function handleLakeDrop(room: Room, lakeDropAction: DropAction): Room {

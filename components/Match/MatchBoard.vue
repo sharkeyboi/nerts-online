@@ -15,7 +15,7 @@
         <div class="flex justify-evenly">
             <MatchNertsPile :cards="playerNertsPile"/>
             <div class="flex justify-between">
-                <MatchDeck class="mx-4" v-model="playerDeck" @deal="PlayerDeal"/>
+                <MatchDeck class="mx-4" v-model="playerDeck" />
                 <MatchStack :cards="playerCurrCards"/>
             </div>
             <MatchRiverStack :cards="cards" v-for="(cards,index) in playerRiver" :key="index" :index="index"/>

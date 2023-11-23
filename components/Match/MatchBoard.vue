@@ -28,7 +28,8 @@ import type { Card } from '~/src/types/card';
 import { shuffle } from '~/src/utils/shuffle';
 import NertzPile from './NertsPile.vue';
 import type { GameBoard, UserSide } from '~/src/types/board';
-import { LocationType, type ClientDragAction, type DropResponse } from '~/src/types/actions';
+import { LocationType } from '~/src/types/actions';
+import type {ClientDragAction, DropResponse } from '~/src/types/actions';
 
 const numbers = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
 const suits = ["♠️","♣️","♦️","♥️"]

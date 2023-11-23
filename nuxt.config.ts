@@ -11,5 +11,5 @@ export default defineNuxtConfig({
       autoprefixer: {}
     }
   },
-  modules: ["@nuxtjs/tailwindcss", "@nuxt/image"]
+  modules: ["@nuxtjs/tailwindcss", "@nuxt/image", "nuxt-icon"]
 })

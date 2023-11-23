@@ -1,24 +1,27 @@
 <template>
     {{ username }}
     <div class="flex flex-col justify-evenly h-full w-10/12">
-        <!-- <div class="flex justify-evenly">
-            <MatchRiverStack :cards="card" v-for="(card,index) in opponentCards" :key="index"/>
+        <div class=" rotate-180 flex justify-evenly">
+            <MatchNertsPile :draggable="false" :cards="opponentNertsPile" />
             <div class="flex justify-between">
-                <MatchDeck  v-model="opponentDeck"/>
-                <MatchStack class='mx-4' :cards="opponentCurrCards"/>
+                <MatchDeck class="mx-4" v-model="opponentDeck" />
+                <MatchStack :cards="opponentCurrCards" />
             </div>
-            <NertzPile :cards="playerNertzPile"/>
-        </div> -->
+            <MatchRiverStack :draggable="false" :cards="cards" v-for="(cards, index) in opponentRiver" :key="index"
+                :index="index" />
+        </div>
         <div class="flex justify-center">
-            <MatchLakeStack @drop="serverHandleLakeDrop($event, index)" class='mx-4' :cards="cards" v-for="(cards, index) in lake" :key="index"/>
+            <MatchLakeStack @drop="serverHandleLakeDrop($event, index)" class='mx-4' :cards="cards"
+                v-for="(cards, index) in lake" :key="index" />
         </div>
         <div class="flex justify-evenly">
-            <MatchNertsPile :cards="playerNertsPile"/>
+            <MatchNertsPile :cards="playerNertsPile" />
             <div class="flex justify-between">
                 <MatchDeck class="mx-4" v-model="playerDeck" />
-                <MatchStack :cards="playerCurrCards"/>
+                <MatchStack :cards="playerCurrCards" />
             </div>
-            <MatchRiverStack @drop="serverHandleRiverDrop($event, index)" :cards="cards" v-for="(cards,index) in playerRiver" :key="index" :index="index"/>
+            <MatchRiverStack :draggable="true" @drop="serverHandleRiverDrop($event, index)" :cards="cards"
+                v-for="(cards, index) in playerRiver" :key="index" :index="index" />
         </div>
     </div>
 </template>
@@ -29,10 +32,10 @@ import { shuffle } from '~/src/utils/shuffle';
 import NertzPile from './NertsPile.vue';
 import type { GameBoard, UserSide } from '~/src/types/board';
 import { LocationType } from '~/src/types/actions';
-import type {ClientDragAction, DropResponse } from '~/src/types/actions';
+import type { ClientDragAction, DropResponse } from '~/src/types/actions';
 
-const numbers = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
-const suits = ["♠️","♣️","♦️","♥️"]
+const numbers = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+const suits = ["♠️", "♣️", "♦️", "♥️"]
 
 const playerNertsPile: Ref<Card[]> = ref([])
 const playerDeck: Ref<Card[]> = ref([])
@@ -40,10 +43,14 @@ const playerCurrCards: Ref<Card[]> = ref([])
 const playerRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 const lake: Ref<Card[][]> = ref(Array.from(Array(8), () => []))
 
+const opponentNertsPile: Ref<Card[]> = ref([])
+const opponentDeck: Ref<Card[]> = ref([])
+const opponentCurrCards: Ref<Card[]> = ref([])
+const opponentRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 
 
-const username = useState('username',() => "")
-const {$io} = useNuxtApp()
+const username = useState('username', () => "")
+const { $io } = useNuxtApp()
 $io.auth = {
     username: username.value
 }
@@ -54,36 +61,48 @@ $io.on('message', (msg) => {
 // $io.on('startGame', (users: string[]) => {
 //     console.log(users)
 // })
-$io.on('startGame', (gameBoard:GameBoard) => {
+$io.on('startGame', (gameBoard: GameBoard) => {
     console.log(gameBoard)
-    const userSide = gameBoard.usersides[username.value]
-    playerNertsPile.value = userSide.nertsPile
-    playerRiver.value = userSide.riverStacks
+    Object.keys(gameBoard.usersides).forEach((currUser) => {
+        const userSide = gameBoard.usersides[currUser]
+        if (currUser == username.value) {
+            playerNertsPile.value = userSide.nertsPile
+            playerRiver.value = userSide.riverStacks
+            playerDeck.value = userSide.deck
+        }
+        else {
+            opponentNertsPile.value = userSide.nertsPile
+            opponentRiver.value = userSide.riverStacks
+            opponentDeck.value = userSide.deck
+        }
+    })
+
+
 })
 $io.on('matchError', async () => {
     await navigateTo('/')
 })
 
 $io.on('dropResponse', (dropResponse: DropResponse) => {
-    switch(dropResponse.toLocation.locationType) {
-        case(LocationType.Lake):
+    switch (dropResponse.toLocation.locationType) {
+        case (LocationType.Lake):
             clientHandleLakeDrop(dropResponse)
             break;
-        case(LocationType.River):
+        case (LocationType.River):
             clientHandleRiverDrop(dropResponse)
             break;
     }
 })
 
 function clientHandleRiverDrop(dropResponse: DropResponse) {
-    if(dropResponse.userId == username.value) {
+    if (dropResponse.userId == username.value) {
         const dropTo = playerRiver.value[dropResponse.toLocation.index]
         dropResponse.cards.forEach((card) => {
             dropTo.push(card)
         })
         const dropFrom = playerRiver.value[dropResponse.fromLocation.index]
         dropResponse.cards.forEach((card) => {
-            dropFrom.splice(dropFrom.indexOf(card),1)
+            dropFrom.splice(dropFrom.indexOf(card), 1)
         })
     }
 }
@@ -104,10 +123,10 @@ function clientHandleLakeDrop(dropResponse: DropResponse) {
     dropResponse.cards.forEach((card) => {
         lake.value[dropResponse.toLocation.index].push(card)
     })
-    if(dropResponse.userId == username.value) {
+    if (dropResponse.userId == username.value) {
         let riverPile = playerRiver.value[dropResponse.fromLocation.index]
         dropResponse.cards.forEach((card) => {
-            riverPile.splice(riverPile.indexOf(card),1)
+            riverPile.splice(riverPile.indexOf(card), 1)
         })
     }
 }

@@ -10,6 +10,7 @@ export default {
   "./app.vue",
   "./error.vue",
 ],
+  darkMode: ['class', '[data-mode="dark"]'],
   theme: {
     colors: {
       primary: colors.violet,

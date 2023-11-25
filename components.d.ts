@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppHeaderAppHeader: typeof import('./components/AppHeader/AppHeader.vue')['default']
-    MatchCard: typeof import('./components/Match/Card.vue')['default']
     MatchDeck: typeof import('./components/Match/Deck.vue')['default']
     MatchLakeStack: typeof import('./components/Match/LakeStack.vue')['default']
     MatchMatchBoard: typeof import('./components/Match/MatchBoard.vue')['default']

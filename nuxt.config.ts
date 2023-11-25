@@ -11,5 +11,9 @@ export default defineNuxtConfig({
       autoprefixer: {}
     }
   },
-  modules: ["@nuxtjs/tailwindcss", "@nuxt/image", "nuxt-icon"]
+  modules: ["@nuxtjs/tailwindcss", "@nuxt/image", "nuxt-icon"],
+  tailwindcss: {
+    cssPath: '~/src/stories/assets/tailwind.css',
+    injectPosition: 'last',
+  },
 })

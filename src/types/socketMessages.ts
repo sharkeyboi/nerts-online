@@ -14,6 +14,7 @@ export interface ClientToServerEvents {
     dropAction: (resp: DropAction) => void
     message: (resp: string) => void
     dealAction: () => void
+    nertsAction: () => void
 }
 
 export interface SocketData {

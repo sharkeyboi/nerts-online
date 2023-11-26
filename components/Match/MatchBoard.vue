@@ -15,7 +15,7 @@
                 v-for="(cards, index) in lake" :key="index" />
         </div>
         <div class="flex justify-evenly">
-            <MatchNertsPile :draggable="true" :cards="playerNertsPile" />
+            <MatchNertsPile @click="serverHandleNerts" :draggable="true" :cards="playerNertsPile" />
             <div class="flex justify-between">
                 <MatchDeck class="mx-4" :cards="playerDeck" @click="serverDeal" />
                 <MatchStack :draggable="true" :cards="playerStack" />
@@ -204,6 +204,10 @@ function clientDeal(user: string) {
         opponentDeck.value = remainingCards
         opponentStack.value = opponentStack.value.concat(dealtCards)
     }
+}
+
+function serverHandleNerts() {
+    $io.emit('nertsAction')
 }
 
 </script>

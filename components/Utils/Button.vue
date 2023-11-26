@@ -1,8 +1,13 @@
 <template>
-    <button :class="` ${background} text-white hover:bg-primary-800  rounded-md px-3 py-1`">{{ label }}</button>
+    <button @click="emit('click')" :class="` ${background} text-white hover:bg-primary-800  rounded-md px-3 py-1`">{{ label
+    }}</button>
 </template>
 
 <script setup lang="ts">
+
+const emit = defineEmits<{
+    (event: 'click'): void
+}>()
 
 const props = defineProps({
     background: {

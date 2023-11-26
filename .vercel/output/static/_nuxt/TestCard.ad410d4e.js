@@ -1,0 +1,1 @@
+import{_ as r,S as a}from"./PlayingCard.vue.5eb94ca1.js";import{f as e,o as t,g as o,u as s}from"./entry.545dcbc7.js";import"./Icon.4cedce90.js";import"./state.50b16471.js";import"./index.df58e121.js";const d=e({__name:"TestCard",setup(n){return(m,p)=>(t(),o(r,{draggable:!0,card:{suit:s(a).Spade,number:"A"}},null,8,["card"]))}});export{d as default};

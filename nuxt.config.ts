@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   },
   modules: ["@nuxtjs/tailwindcss", "@nuxt/image", "nuxt-icon"],
   tailwindcss: {
-    cssPath: '~/src/stories/assets/tailwind.css',
+    cssPath: '~/assets/tailwind.css',
     injectPosition: 'last',
   },
   nitro: {

@@ -50,30 +50,58 @@ export default defineNitroPlugin((nitroApp) => {
                 socketServer.to(currRoom.roomId).emit("dropResponse", data) // Return the updated state for the specific lake pile
             }
         })
+        socket.on('dealAction', () => {
+            if (handleDealAction(currRoom, username)) {
+                socketServer.to(currRoom.roomId).emit("dealResponse", username)
+            } else {
+                const newDeck = reshuffleAction(currRoom, username)
+                socketServer.to(currRoom.roomId).emit("reshuffleResponse", {
+                    userId: username,
+                    cards: newDeck
+                })
+            }
+        })
     })
 
 
 })
+
+function handleDealAction(room: Room, user: string): boolean {
+    let userDeck = room.gameBoard.usersides[user].deck
+    const dealtCards = userDeck.slice(0, 3)
+    console.log(dealtCards)
+    if (dealtCards.length == 0) return false
+    room.gameBoard.usersides[user].deck = userDeck.slice(dealtCards.length)
+    room.gameBoard.usersides[user].stack = room.gameBoard.usersides[user].stack.concat(dealtCards)
+    return true
+}
+
+function reshuffleAction(room: Room, user: string) {
+    const userSide = room.gameBoard.usersides[user]
+    userSide.deck = [...userSide.stack]
+    userSide.stack = []
+    return userSide.deck
+}
+
 
 function handleDropAction(room: Room, dropAction: DropAction): boolean {
     switch (dropAction.toLocation.locationType) {
         case (LocationType.Lake):
             const lakePile = room.gameBoard.lake[dropAction.toLocation.index]
             if (!lakePile) return false
-            if (validateLakeDrop(lakePile, dropAction.cards)) {
-                room = executeLakeDrop(room, dropAction)
-                return true
-            }
+            if (!validateLakeDrop(lakePile, dropAction.cards)) return false
+            room = executeLakeDrop(room, dropAction)
             break;
         case (LocationType.River):
             const riverPile = room.gameBoard.usersides[dropAction.userId].riverStacks[dropAction.toLocation.index]
             if (!riverPile) return false;
-            if (validateRiverDrop(riverPile, dropAction.cards)) {
-                room = executeRiverDrop(room, dropAction)
-                return true
-            }
+            console.log("Validating river drop")
+            if (!validateRiverDrop(riverPile, dropAction.cards)) return false
+            console.log("Executing river drop")
+            room = executeRiverDrop(room, dropAction)
     }
-    return false
+    room = removeFromLocation(room, dropAction)
+    return true
 }
 
 function executeRiverDrop(room: Room, riverDropAction: DropAction): Room {
@@ -82,7 +110,6 @@ function executeRiverDrop(room: Room, riverDropAction: DropAction): Room {
     riverDropAction.cards.forEach(card => {
         riverTo?.push(card)
     })
-    room = removeFromLocation(room, riverDropAction)
     return room
 }
 
@@ -92,7 +119,6 @@ function executeLakeDrop(room: Room, lakeDropAction: DropAction): Room {
     lakeDropAction.cards.forEach(card => {
         lakePile?.push(card)
     })
-    room = removeFromLocation(room, lakeDropAction)
     return room
 }
 
@@ -100,14 +126,36 @@ function removeFromLocation(room: Room, dropAction: DropAction): Room {
     switch (dropAction.fromLocation.locationType) {
         case (LocationType.River):
             return removeFromRiver(room, dropAction)
+        case (LocationType.Stack):
+            return removeFromStack(room, dropAction)
+        case (LocationType.Nerts):
+            return removeFromNerts(room, dropAction)
         default:
             return room
     }
 }
 
+function removeFromNerts(room: Room, dropAction: DropAction): Room {
+    const nerts = room.gameBoard.usersides[dropAction.userId].nertsPile
+    dropAction.cards.forEach((card) => {
+        nerts.splice(nerts.indexOf(card), 1)
+    })
+    return room
+}
+
+function removeFromStack(room: Room, dropAction: DropAction): Room {
+    const stack = room.gameBoard.usersides[dropAction.userId].stack
+    dropAction.cards.forEach((card) => {
+        stack.splice(stack.indexOf(card), 1)
+    })
+    return room
+}
+
 function removeFromRiver(room: Room, dropAction: DropAction): Room {
     const riverPile = room.gameBoard.usersides[dropAction.userId].riverStacks[dropAction.fromLocation.index]
-    riverPile?.splice(riverPile.indexOf(dropAction.cards[0]), 1)
+    dropAction.cards.forEach((card) => {
+        riverPile?.splice(riverPile.indexOf(card), 1)
+    })
     return room
 }
 

@@ -1,20 +1,15 @@
 <template>
-    <div @click="$emit('clicked')" class="border-2 w-24 bg-slate-100 h-32 flex flex-col justify-between cursor-pointer select-none">
-        <div class="left-0 top-0 flex flex-col w-6 text-center">
-            <h1>{{ cards.length > 0 ? cards[cards.length-1].number : "" }}</h1>
-            <h1>{{ cards.length > 0 ? cards[cards.length-1].suit: "" }}</h1>
-        </div>
-        <div class="flex flex-row-reverse">
+    <MatchPlayingCard :card="cards[cards.length - 1]" v-if="cards.length > 0" :draggable="draggable"
+        @drag="dragStartHandler">
 
-            <div class="flex flex-col-reverse w-6 text-center">
-                <h1 class=" rotate-180">{{  cards.length > 0 ? cards[cards.length-1].number : "" }}</h1>
-                <h1 class=" rotate-180">{{ cards.length > 0 ? cards[cards.length-1].suit: ""  }}</h1>
-            </div>
-        </div>
+    </MatchPlayingCard>
+    <div v-else :class="`border-2 border-slate-300 w-24 h-32 bg-slate-200 flex flex-col justify-between`">
+
     </div>
 </template>
 
 <script setup lang="ts">
+import { ClientDragAction, LocationType } from '~/src/types/actions';
 import type { Card } from '~/src/types/card';
 
 
@@ -22,10 +17,25 @@ const emit = defineEmits<{
     clicked: []
 }>()
 
-defineProps<{
-    cards: Card[]
+const props = defineProps<{
+    cards: Card[],
+    draggable: boolean
 }>()
 
+function dragStartHandler(event: DragEvent) {
+    const dropAction: ClientDragAction = {
+        cards: [props.cards[props.cards.length - 1]],
+        fromLocation: {
+            locationType: LocationType.Stack,
+            index: 0
+        }
+    }
+    if (event.dataTransfer) {
+        event.dataTransfer.setData('text/plain', JSON.stringify(dropAction))
+        event.dataTransfer.dropEffect = "move"
+    }
+
+}
 
 
 </script>

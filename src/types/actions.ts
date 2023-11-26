@@ -39,3 +39,8 @@ export class ActionError extends Error {
         Object.setPrototypeOf(this, ActionError.prototype);
     }
 }
+
+export interface ReshuffleResponse {
+    userId: string,
+    cards: Card[]
+}

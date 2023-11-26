@@ -47,6 +47,10 @@ export const MultipleCards: Story = {
         }, {
             suit: Suit.Spade,
             number: "Q"
+        },
+        {
+            suit: Suit.Heart,
+            number: "J"
         }],
         draggable: true,
         index: 0

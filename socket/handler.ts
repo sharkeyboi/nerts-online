@@ -1,15 +1,15 @@
-import { Server, Socket } from 'socket.io'
-import type { DefaultEventsMap } from 'socket.io/dist/typed-events'
-import { v4 } from 'uuid'
-import { validateLakeDrop } from '~/src/serverDropHandlers'
-import { validateRiverDrop } from '~/src/serverDropHandlers'
-import type { DropAction } from '~/src/types/actions'
-import { LocationType } from '~/src/types/actions'
-import type { GameBoard, UserSide } from '~/src/types/board'
-import type { Card } from '~/src/types/card'
-import type { ClientToServerEvents, ServerToClientEvents } from '~/src/types/socketMessages'
-import { cartesian, numbers, suits } from '~/src/utils/cardData'
-import { shuffle } from '~/src/utils/shuffle'
+import { Server, Socket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { v4 } from "uuid";
+import { validateLakeDrop, validateRiverDrop } from "~/src/serverDropHandlers";
+import { DropAction, LocationType } from "~/src/types/actions";
+import { GameBoard, UserSide } from "~/src/types/board";
+import { Card } from "~/src/types/card";
+import { ClientToServerEvents, ServerToClientEvents } from "~/src/types/socketMessages";
+import { cartesian, numbers, suits } from "~/src/utils/cardData";
+import { shuffle } from "~/src/utils/shuffle";
+
+
 const MAX_USERS = 2
 type Room = {
     roomId: string,
@@ -25,14 +25,8 @@ const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
 })
 
 let rooms: Room[] = []
-export default defineNitroPlugin((nitroApp) => {
-    const socketServer = new Server<ClientToServerEvents, ServerToClientEvents>(3001, {
-        serveClient: false,
-        cors: {
-            origin: '*'
-        },
 
-    })
+export const socketHandler = async (socketServer: Server<ClientToServerEvents, ServerToClientEvents>) => {
     socketServer.on('connection', (socket) => {
         const username = socket.handshake.auth.username
         let currRoom = joinRoom(socket)
@@ -62,9 +56,7 @@ export default defineNitroPlugin((nitroApp) => {
             }
         })
     })
-
-
-})
+}
 
 function handleDealAction(room: Room, user: string): boolean {
     let userDeck = room.gameBoard.usersides[user].deck

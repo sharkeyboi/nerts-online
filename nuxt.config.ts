@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
   },
@@ -15,5 +15,9 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: '~/src/stories/assets/tailwind.css',
     injectPosition: 'last',
+  },
+  nitro: {
+    entry: process.env.NODE_ENV == 'production' ? undefined : "../preset/entry.dev",
+    preset: "./preset",
   },
 })

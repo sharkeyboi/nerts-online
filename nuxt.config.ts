@@ -20,4 +20,9 @@ export default defineNuxtConfig({
     entry: process.env.NODE_ENV == 'production' ? undefined : "../preset/entry.dev",
     preset: "./preset",
   },
+  runtimeConfig: {
+    public: {
+      socketURL: process.env.SOCKET_URL
+    }
+  }
 })

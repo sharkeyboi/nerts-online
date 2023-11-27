@@ -1,6 +1,6 @@
 <template>
     {{ username }}
-    <div class="flex flex-col justify-evenly h-full w-10/12">
+    <div class=" flex flex-col justify-evenly h-full">
         <div class=" rotate-180 flex justify-evenly">
             <MatchNertsPile :draggable="false" :cards="opponentNertsPile" />
             <div class="flex justify-between">
@@ -24,6 +24,9 @@
                 v-for="(cards, index) in playerRiver" :key="index" :index="index" />
         </div>
     </div>
+    <UtilsModal :show="showScores">
+        <Scores @close="serverStartRound" :scores="currScores" />
+    </UtilsModal>
 </template>
 
 <script setup lang="ts">
@@ -34,6 +37,8 @@ import type { GameBoard, UserSide } from '~/src/types/board';
 import { LocationType } from '~/src/types/actions';
 import type { ClientDragAction, DropResponse } from '~/src/types/actions';
 import { io } from 'socket.io-client';
+import Scores from './Scores.vue';
+import { Score } from '~/src/types/socketMessages';
 
 const numbers = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 const suits = ["♠️", "♣️", "♦️", "♥️"]
@@ -49,8 +54,9 @@ const opponentDeck: Ref<Card[]> = ref([])
 const opponentStack: Ref<Card[]> = ref([])
 const opponentRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 
-
+const showScores = ref(false)
 const username = useState('username', () => "")
+const currScores: Ref<Score[][]> = ref([])
 const { $io } = useNuxtApp()
 $io.auth = {
     username: username.value
@@ -70,17 +76,21 @@ $io.on('startGame', (gameBoard: GameBoard) => {
             playerNertsPile.value = userSide.nertsPile
             playerRiver.value = userSide.riverStacks
             playerDeck.value = userSide.deck
+            playerStack.value = []
         }
         else {
             opponentNertsPile.value = userSide.nertsPile
             opponentRiver.value = userSide.riverStacks
             opponentDeck.value = userSide.deck
+            opponentStack.value = []
         }
+        lake.value = Array.from(Array(8), () => [])
     })
 
 
 })
 $io.on('matchError', async () => {
+    $io.disconnect()
     await navigateTo('/')
 })
 
@@ -117,6 +127,11 @@ $io.on('reshuffleResponse', (resp) => {
         opponentDeck.value = resp.cards
         opponentStack.value = []
     }
+})
+
+$io.on('roundEnd', (resp) => {
+    currScores.value = resp
+    showScores.value = true
 })
 
 function clientHandleRiverDrop(dropResponse: DropResponse) {
@@ -209,5 +224,11 @@ function clientDeal(user: string) {
 function serverHandleNerts() {
     $io.emit('nertsAction')
 }
+
+function serverStartRound() {
+    showScores.value = false
+    $io.emit("startRound")
+}
+
 
 </script>

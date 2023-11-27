@@ -14,11 +14,13 @@ declare module 'vue' {
     MatchNertsPile: typeof import('./components/Match/NertsPile.vue')['default']
     MatchPlayingCard: typeof import('./components/Match/PlayingCard.vue')['default']
     MatchRiverStack: typeof import('./components/Match/RiverStack.vue')['default']
+    MatchScores: typeof import('./components/Match/Scores.vue')['default']
     MatchStack: typeof import('./components/Match/Stack.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UtilsAppHeaderButton: typeof import('./components/Utils/AppHeaderButton.vue')['default']
     UtilsButton: typeof import('./components/Utils/Button.vue')['default']
     UtilsCard: typeof import('./components/Utils/Card.vue')['default']
+    UtilsModal: typeof import('./components/Utils/Modal.vue')['default']
   }
 }

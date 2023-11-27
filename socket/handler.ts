@@ -5,16 +5,14 @@ import { validateLakeDrop, validateRiverDrop } from "~/src/serverDropHandlers";
 import { DropAction, LocationType } from "~/src/types/actions";
 import { GameBoard, UserSide } from "~/src/types/board";
 import { Card } from "~/src/types/card";
-import { ClientToServerEvents, ServerToClientEvents } from "~/src/types/socketMessages";
+import { ClientToServerEvents, Room, Score, ServerToClientEvents } from "~/src/types/socketMessages";
 import { cartesian, numbers, suits } from "~/src/utils/cardData";
 import { shuffle } from "~/src/utils/shuffle";
 
 
 const MAX_USERS = 2
-type Room = {
-    roomId: string,
-    gameBoard: GameBoard
-}
+
+
 
 
 const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
@@ -55,7 +53,33 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
                 })
             }
         })
+        socket.on('nertsAction', () => {
+            if (currRoom.gameBoard.usersides[username].nertsPile.length == 0) { // Confirm nerts is possible
+                currRoom = handleRoundEnd(currRoom)
+                socketServer.to(currRoom.roomId).emit("roundEnd", currRoom.scores)
+            }
+        })
+        socket.on('startRound', () => {
+            currRoom.gameBoard.usersides[username].ready = true
+            if (Object.values(currRoom.gameBoard.usersides).every(side => side.ready)) {
+                currRoom.gameBoard = getNewGameBoard(Object.keys(currRoom.gameBoard.usersides))
+                socketServer.to(currRoom.roomId).emit("startGame", currRoom.gameBoard)
+            }
+        })
     })
+}
+
+function handleRoundEnd(room: Room): Room {
+    const currScores: Score[] = []
+    Object.keys(room.gameBoard.usersides).forEach((user) => {
+        room.gameBoard.usersides[user].ready = false
+        currScores.push({
+            userId: user,
+            score: room.gameBoard.usersides[user].points - (2 * room.gameBoard.usersides[user].nertsPile.length)
+        })
+    })
+    room.scores.push(currScores)
+    return room
 }
 
 function handleDealAction(room: Room, user: string): boolean {
@@ -110,6 +134,7 @@ function executeLakeDrop(room: Room, lakeDropAction: DropAction): Room {
     const lakePile = room.gameBoard.lake[lakeDropAction.toLocation.index]
     lakeDropAction.cards.forEach(card => {
         lakePile?.push(card)
+        room.gameBoard.usersides[lakeDropAction.userId].points += 1
     })
     return room
 }
@@ -155,7 +180,8 @@ function joinRoom(socket: Socket<ClientToServerEvents, ServerToClientEvents, Def
     if (rooms.length == 0 || Object.keys(rooms[rooms.length - 1].gameBoard.usersides).length >= MAX_USERS) {
         const newRoom: Room = {
             roomId: v4(),
-            gameBoard: getNewGameBoard([socket.handshake.auth.username])
+            gameBoard: getNewGameBoard([socket.handshake.auth.username]),
+            scores: []
         }
         rooms.push(newRoom)
         socket.join(newRoom.roomId)
@@ -181,7 +207,8 @@ function getNewGameBoard(users: string[]): GameBoard {
             riverStacks: playerCardDeck.slice(13, 18).map((card) => [card]),
             deck: playerCardDeck.slice(18),
             stack: [],
-            points: 0
+            points: 0,
+            ready: true
         }
     })
     const gameBoard: GameBoard = {
@@ -199,7 +226,8 @@ function addUserToGameBoard(gameBoard: GameBoard, user: string): GameBoard {
         riverStacks: playerCardDeck.slice(13, 18).map((card) => [card]),
         deck: playerCardDeck.slice(18),
         stack: [],
-        points: 0
+        points: 0,
+        ready: true
     }
     gameBoard.usersides[user] = newUser
     return gameBoard

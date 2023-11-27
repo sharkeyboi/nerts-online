@@ -14,4 +14,5 @@ export interface UserSide {
     stack: Card[]
     riverStacks: Card[][]
     points: number
+    ready: boolean
 }

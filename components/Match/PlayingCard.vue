@@ -1,5 +1,5 @@
 <template>
-    <div :class="`border-2 border-slate-300 w-24 h-32 bg-slate-200 flex flex-col justify-between ${card ? 'cursor-pointer' : ''} select-none`"
+    <div :class="`border-2 border-slate-600 w-24 h-32 bg-slate-200 flex flex-col justify-between ${card ? 'cursor-pointer' : ''} select-none`"
         @dragover="dragoverHandler" @drop="dropHandler" @dragstart="dragStartHandler"
         :draggable="draggable ? 'true' : 'false'">
         <div class="left-0 top-0 flex flex-col w-6 text-center">

@@ -2,7 +2,7 @@
     <MatchPlayingCard :card="cards[cards.length - 1]" v-if="cards.length > 0" @drop="dropHandler" :draggable="false">
 
     </MatchPlayingCard>
-    <div v-else :class="`border-2 border-slate-300 w-24 h-32 bg-slate-200 flex flex-col justify-between`"
+    <div v-else :class="`border-2 border-slate-600 w-24 h-32 bg-slate-200 flex flex-col justify-between`"
         @drop="dropHandler" @dragover="dragoverHandler">
 
     </div>

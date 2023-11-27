@@ -1,6 +1,16 @@
 import type { DropAction, DropResponse, ReshuffleResponse } from "./actions";
 import type { GameBoard } from "./board";
 
+export type Score = {
+    userId: string,
+    score: number
+}
+
+export type Room = {
+    roomId: string,
+    gameBoard: GameBoard,
+    scores: Score[][]
+}
 export interface ServerToClientEvents {
     dropResponse: (resp: DropResponse) => void
     matchError: () => void
@@ -8,6 +18,7 @@ export interface ServerToClientEvents {
     message: (resp: string) => void
     dealResponse: (user: string) => void
     reshuffleResponse: (resp: ReshuffleResponse) => void
+    roundEnd: (resp: Score[][]) => void
 }
 
 export interface ClientToServerEvents {
@@ -15,6 +26,7 @@ export interface ClientToServerEvents {
     message: (resp: string) => void
     dealAction: () => void
     nertsAction: () => void
+    startRound: () => void
 }
 
 export interface SocketData {

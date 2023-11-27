@@ -43,7 +43,12 @@ const listener = server.listen(listenAddress, () => {
     });
 });
 
-const io = new SocketServer(server)
+const io = new SocketServer(server, {
+    cors: {
+        origin: "https://nerts-online-lwxkhv64cq-uc.a.run.app",
+        methods: ["GET", "POST"]
+    }
+})
 socketHandler(io);
 // Trap unhandled errors
 trapUnhandledNodeErrors();

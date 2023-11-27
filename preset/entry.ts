@@ -40,12 +40,17 @@ const listener = server.listen(path ? { path } : { port, host }, (err) => {
     }
     const baseURL = (useRuntimeConfig().app.baseURL || "").replace(/\/$/, "");
     const url = `${protocol}://${addressInfo.family === "IPv6"
-            ? `[${addressInfo.address}]`
-            : addressInfo.address
+        ? `[${addressInfo.address}]`
+        : addressInfo.address
         }:${addressInfo.port}${baseURL}`;
     console.log(`Listening on ${url}`);
 });
-const io = new SocketServer(server)
+const io = new SocketServer(server, {
+    cors: {
+        origin: "https://nerts-online-lwxkhv64cq-uc.a.run.app",
+        methods: ["GET", "POST"]
+    }
+})
 socketHandler(io);
 // Trap unhandled errors
 trapUnhandledNodeErrors();

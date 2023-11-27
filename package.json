@@ -11,7 +11,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "start": "node .output/server/index.mjs"
   },
   "devDependencies": {
     "@histoire/plugin-nuxt": "^0.17.5",

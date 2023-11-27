@@ -17,7 +17,8 @@ export default {
       secondary: colors.rose,
       slate: colors.slate,
       gray: colors.slate,
-      white: colors.white
+      white: colors.white,
+      green: colors.green
     },
     extend: {},
   },

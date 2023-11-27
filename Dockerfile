@@ -22,4 +22,3 @@ FROM node:18-slim as deploy
 WORKDIR /app
 COPY --from=build /app/.output/ ./.output/
 ENTRYPOINT [ "node", ".output/server/index.mjs"]
-

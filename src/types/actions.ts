@@ -18,14 +18,14 @@ export interface ClientDragAction {
 }
 
 export interface DropAction {
-    userId: string,
+    userID: string,
     cards: Card[],
     fromLocation: Location,
     toLocation: Location
 }
 
 export interface DropResponse {
-    userId: string,
+    userID: string,
     cards: Card[],
     fromLocation: Location,
     toLocation: Location

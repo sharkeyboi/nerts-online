@@ -2,8 +2,6 @@ import type { Card } from "~/src/types/card";
 import { numbers, suitPairings } from "./utils/cardData";
 
 export function validateRiverDrop(riverPile: Card[], dropCards: Card[]): boolean {
-    console.log(riverPile)
-    console.log(dropCards)
     if (riverPile.length == 0) return true
     if (dropCards.length == 0) return false
     const topRiverCard = riverPile[riverPile.length - 1];

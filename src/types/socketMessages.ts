@@ -2,7 +2,7 @@ import type { DropAction, DropResponse, ReshuffleResponse } from "./actions";
 import type { GameBoard } from "./board";
 
 export type Score = {
-    userId: string,
+    userID: string,
     score: number
 }
 

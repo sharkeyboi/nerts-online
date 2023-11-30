@@ -1,14 +1,12 @@
 import type { Card } from "./card"
 
 export interface GameBoard {
-    usersides: {
-        [key: string]: UserSide
-    }
+    usersides: UserSide[]
     lake: Card[][]
 }
 
 export interface UserSide {
-    userId: string
+    userID: string
     nertsPile: Card[]
     deck: Card[]
     stack: Card[]

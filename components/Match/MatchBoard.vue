@@ -54,7 +54,7 @@ const opponentDeck: Ref<Card[]> = ref([])
 const opponentStack: Ref<Card[]> = ref([])
 const opponentRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 
-const showScores = ref(false)
+const showScores = ref(true)
 const username = useState('username', () => "")
 const currScores: Ref<Score[][]> = ref([])
 const { $io } = useNuxtApp()

@@ -37,6 +37,14 @@ export class Match {
         this.gameBoard = this.getNewGameBoard(this.users)
     }
 
+
+
+    getUserSide(userID: string) {
+        const userSide = this.gameBoard.usersides.find(x => x.userID == userID)
+        if(userSide) return userSide
+        throw Error("User not found!")
+    }
+
     resetBoard() {
         this.gameBoard = this.getNewGameBoard(this.users)
     }
@@ -75,7 +83,9 @@ export class Match {
         this.gameBoard.usersides = this.gameBoard.usersides.filter(x => x.userID != userID)
     }
 
-    deal(userSide: UserSide): boolean {
+    deal(userID: string): boolean {
+        const userSide = this.getUserSide(userID)
+        console.log(userSide.deck)
         const dealtCards = userSide.deck.slice(0, 3)
         if (dealtCards.length == 0) {
             this.moveStackToDeck(userSide)
@@ -83,6 +93,7 @@ export class Match {
         }
         userSide.deck = userSide.deck.slice(dealtCards.length)
         userSide.stack = userSide.stack.concat(dealtCards)
+        console.log(userSide.stack)
         return true
     }
 
@@ -92,16 +103,20 @@ export class Match {
     }
 
     drop(dropAction: DropAction): boolean {
-        if (this.validateTake(dropAction) && this.validateDrop(dropAction)) {
-            this.placeInLocation(dropAction.userID, dropAction.toLocation, dropAction.cards)
-            this.removeFromLocation(dropAction.userID, dropAction.fromLocation, dropAction.cards)
-            return true
+        if (this.validateTake(dropAction)){
+            console.log("TAKE VALIDATED")
+            if(this.validateDrop(dropAction)) {
+                console.log("DROP VALIDATED")
+                this.placeInLocation(dropAction.userID, dropAction.toLocation, dropAction.cards)
+                this.removeFromLocation(dropAction.userID, dropAction.fromLocation, dropAction.cards)
+                return true
+            }
         }
         return false
     }
 
     placeInLocation(userID: string, location: Location, cards: Card[]) {
-        let userSide = this.gameBoard.usersides.find(x => x.userID == userID)
+        let userSide = this.getUserSide(userID)
         if (!userSide) return
         switch (location.locationType) {
             case (LocationType.Lake):
@@ -120,17 +135,16 @@ export class Match {
     }
 
     removeFromLocation(userID: string, location: Location, cards: Card[]) {
-        let userSide = this.gameBoard.usersides.find(x => x.userID == userID)
+        let userSide = this.getUserSide(userID)
         if (!userSide) return
         switch (location.locationType) {
             case (LocationType.River):
                 const riverStack = userSide.riverStacks[location.index];
                 cards.forEach(card => {
                     const index = riverStack.indexOf(card)
-                    if (index !== -1) {
                         riverStack.splice(index, 1)
-                    }
                 })
+                console.log(riverStack)
                 break
             case (LocationType.Nerts):
                 const nertsStack = userSide.nertsPile
@@ -155,35 +169,54 @@ export class Match {
                 const lakePile = this.gameBoard.lake[dropAction.toLocation.index]
                 return validateLakeDrop(lakePile, dropAction.cards)
             case (LocationType.River):
-                const userSide = this.gameBoard.usersides.find(x => x.userID == dropAction.userID)
+                const userSide = this.getUserSide(dropAction.userID)
                 if (!userSide) return false
                 const riverStack = userSide.riverStacks[dropAction.toLocation.index]
                 if (!riverStack) return false
+                console.log(riverStack)
                 return validateRiverDrop(riverStack, dropAction.cards)
         }
         return false
     }
 
     private validateTake(dropAction: DropAction): boolean {
-        const userSide = this.gameBoard.usersides.find(x => x.userID == dropAction.userID)
+        const userSide = this.getUserSide(dropAction.userID)
         if (!userSide) return false
+        console.log("USER SIDE EXISTS")
         switch (dropAction.fromLocation.locationType) {
             case (LocationType.River):
                 const riverStack = userSide.riverStacks[dropAction.fromLocation.index]
+                
                 if (!riverStack) return false
-                return dropAction.cards.every(card => riverStack.includes(card))
+                console.log("TAKING FROM RIVER")
+                console.log(riverStack)
+                console.log(dropAction.cards[0])
+                console.log(riverStack.includes(dropAction.cards[0]))
+                console.log(dropAction.cards.every(card => riverStack.some(item => item.number == card.number && item.suit == card.suit)))
+                return dropAction.cards.every(card => riverStack.some(item => item.number == card.number && item.suit == card.suit))
             case (LocationType.Nerts):
                 const nertsStack = userSide.nertsPile
-                return dropAction.cards.every(card => nertsStack.includes(card))
+                return dropAction.cards.every(card => nertsStack.some(item => item.number == card.number && item.suit == card.suit))
             case (LocationType.Stack):
                 const stack = userSide.stack
-                return dropAction.cards.every(card => stack.includes(card))
+                console.log("Taking from Stack")
+                console.log(stack)
+                console.log(dropAction.cards[0])
+                console.log(stack.includes(dropAction.cards[0]))
+                console.log(dropAction.cards.every(card => stack.some(item => item.number == card.number && item.suit == card.suit)))
+                
+                return dropAction.cards.every(card => stack.some(item => item.number == card.number && item.suit == card.suit))
         }
         return false
     }
 
+    readyForStart(userID: string) {
+        const userSide = this.getUserSide(userID)
+        userSide.ready = true
+    }
+
     roundEnd(userID: string): boolean {
-        const userSide = this.gameBoard.usersides.find(x => x.userID == userID)
+        const userSide = this.getUserSide(userID)
         if (!userSide) return false
         if (userSide.nertsPile.length > 0) return false
         const currScores: Score[] = []
@@ -197,4 +230,6 @@ export class Match {
         this.scores.push(currScores)
         return true
     }
+
+
 }

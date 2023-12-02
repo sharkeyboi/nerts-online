@@ -28,16 +28,10 @@ let activeMatches: Match[] = []
 
 export const socketHandler = async (socketServer: Server<ClientToServerEvents, ServerToClientEvents>) => {
     socketServer.on('connection', (socket) => {
-        console.log(`User ${socket.handshake.auth.username} connected`)
         const username: string = socket.handshake.auth.username
-        socketServer.emit('message', `${username} has entered room`)
-        return
         let currMatch = joinMatch(username)
         socket.join(currMatch.roomID)
-        const userSide = currMatch.gameBoard.usersides.find(x => x.userID == username)
-        if (!userSide) {
-            throw Error("Match not properly initialized")
-        }
+        socketServer.to(currMatch.roomID).emit('message', `${username} has entered room: ${currMatch.roomID}`)
         socket.on('disconnect', (reason) => {
 
             socketServer.to(currMatch.roomID).emit('matchError')
@@ -46,12 +40,15 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
         })
 
         socket.on('dropAction', (data: DropAction) => {
+            console.log(data)
             if (currMatch.drop(data)) {
+                console.log("DROPPING")
                 socketServer.to(currMatch.roomID).emit("dropResponse", data) // Return the updated state for the specific lake pile
             }
         })
         socket.on('dealAction', () => {
-            if (currMatch.deal(userSide)) {
+            const userSide = currMatch.getUserSide(username)
+            if (currMatch.deal(username)) {
                 socketServer.to(currMatch.roomID).emit("dealResponse", username)
             } else {
                 socketServer.to(currMatch.roomID).emit("reshuffleResponse", {
@@ -66,9 +63,12 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
             }
         })
         socket.on('startRound', () => {
-            userSide.ready = true
+            currMatch.readyForStart(username)
             if (currMatch.gameBoard.usersides.every(side => side.ready)) {
                 currMatch.resetBoard()
+                currMatch.gameBoard.usersides.forEach((asdf) => {
+                    console.log(asdf.deck)
+                })
                 socketServer.to(currMatch.roomID).emit("startGame", currMatch.gameBoard)
             }
         })

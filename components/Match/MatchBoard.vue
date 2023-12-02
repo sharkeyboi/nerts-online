@@ -47,6 +47,7 @@ const playerNertsPile: Ref<Card[]> = ref([])
 const playerDeck: Ref<Card[]> = ref([])
 const playerStack: Ref<Card[]> = ref([])
 const playerRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
+
 const lake: Ref<Card[][]> = ref(Array.from(Array(8), () => []))
 
 const opponentNertsPile: Ref<Card[]> = ref([])
@@ -108,8 +109,10 @@ $io.on('dropResponse', (dropResponse: DropResponse) => {
             break;
         case (LocationType.Nerts):
             clientRemoveFromNerts(dropResponse)
+            break;
         case (LocationType.Stack):
             clientRemoveFromStack(dropResponse)
+            break;
     }
 })
 

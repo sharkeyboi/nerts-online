@@ -8,7 +8,7 @@ import destr from "destr";
 import { toNodeListener } from "h3";
 import { trapUnhandledNodeErrors } from "#internal/nitro/utils";
 import { setupGracefulShutdown } from "#internal/nitro/shutdown";
-import { socketHandler } from "~/socket/handler";
+import { socketHandler } from "~/src/socket/handler";
 const nitroApp = useNitroApp();
 
 const cert = process.env.NITRO_SSL_CERT;

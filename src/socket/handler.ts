@@ -1,14 +1,14 @@
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { v4 } from "uuid";
-import { Match } from "~/src/models/match";
-import { validateLakeDrop, validateRiverDrop } from "~/src/serverDropHandlers";
-import { DropAction, LocationType } from "~/src/types/actions";
-import { GameBoard, UserSide } from "~/src/types/board";
-import { Card } from "~/src/types/card";
-import { ClientToServerEvents, Room, Score, ServerToClientEvents } from "~/src/types/socketMessages";
-import { cartesian, numbers, suits } from "~/src/utils/cardData";
-import { shuffle } from "~/src/utils/shuffle";
+import { Match } from "../models/match";
+import { validateLakeDrop, validateRiverDrop } from "../serverDropHandlers";
+import { DropAction, LocationType } from "../types/actions";
+import { GameBoard, UserSide } from "../types/board";
+import { Card } from "../types/card";
+import { ClientToServerEvents, Room, Score, ServerToClientEvents } from "../types/socketMessages";
+import { cartesian, numbers, suits } from "../utils/cardData";
+import { shuffle } from "../utils/shuffle";
 
 
 const MAX_USERS = 2

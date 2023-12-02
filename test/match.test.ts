@@ -32,7 +32,7 @@ describe("match class", () => {
     })
     test("handles dealing", () => {
         const deckLength = newMatch.gameBoard.usersides[0].deck.length
-        newMatch.deal(newMatch.gameBoard.usersides[0])
+        newMatch.deal("Eric")
         expect(newMatch.gameBoard.usersides[0].stack.length).toEqual(3)
         expect(newMatch.gameBoard.usersides[0].deck.length).toEqual(deckLength - 3)
     })
@@ -40,7 +40,7 @@ describe("match class", () => {
         let userSide = newMatch.gameBoard.usersides[0]
         userSide.deck = []
         userSide.stack = [aceOfSpades]
-        newMatch.deal(userSide)
+        newMatch.deal("Eric")
         expect(userSide.deck).toEqual([aceOfSpades])
         expect(userSide.stack).toEqual([])
     })
@@ -150,6 +150,11 @@ describe("match class", () => {
         expect(newMatch.scores[0].length).toEqual(2) // Second array is per user
         expect(newMatch.scores[0][0].score).toEqual(0)
         expect(newMatch.scores[0][1].score).toEqual(-26)
+    })
+    test("no nerts cards in deck", () => {
+        newMatch.gameBoard.usersides[0].nertsPile.forEach((card) => {
+            expect(newMatch.gameBoard.usersides[0].deck.some(deckCard=>deckCard.number==card.number && deckCard.suit == card.suit)).toBeFalsy()
+        })
     })
 })
 

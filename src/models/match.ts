@@ -16,6 +16,8 @@ const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
 
 
 //TODO Refactor scores into users property
+
+// TODO Scores don't work
 export interface MatchUser {
     userID: string
     scores: number[]

@@ -47,7 +47,7 @@ const listener = server.listen(path ? { path } : { port, host }, (err) => {
 });
 const io = new SocketServer(server, {
     cors: {
-        origin: "https://nerts-online-lwxkhv64cq-uc.a.run.app",
+        origin: "*",
         methods: ["GET", "POST"]
     }
 })

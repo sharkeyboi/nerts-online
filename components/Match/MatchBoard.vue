@@ -70,18 +70,17 @@ $io.on('message', (msg) => {
 // })
 $io.on('startGame', (gameBoard: GameBoard) => {
     console.log(gameBoard)
-    Object.keys(gameBoard.usersides).forEach((currUser) => {
-        const userSide = gameBoard.usersides[currUser]
-        if (currUser == username.value) {
-            playerNertsPile.value = userSide.nertsPile
-            playerRiver.value = userSide.riverStacks
-            playerDeck.value = userSide.deck
+    gameBoard.usersides.forEach((currUserSide) => {
+        if (currUserSide.userID == username.value) {
+            playerNertsPile.value = currUserSide.nertsPile
+            playerRiver.value = currUserSide.riverStacks
+            playerDeck.value = currUserSide.deck
             playerStack.value = []
         }
         else {
-            opponentNertsPile.value = userSide.nertsPile
-            opponentRiver.value = userSide.riverStacks
-            opponentDeck.value = userSide.deck
+            opponentNertsPile.value = currUserSide.nertsPile
+            opponentRiver.value = currUserSide.riverStacks
+            opponentDeck.value = currUserSide.deck
             opponentStack.value = []
         }
         lake.value = Array.from(Array(8), () => [])

@@ -37,8 +37,10 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
             throw Error("Match not properly initialized")
         }
         socket.on('disconnect', (reason) => {
+
             socketServer.to(currMatch.roomID).emit('matchError')
             activeMatches.splice(activeMatches.indexOf(currMatch), 1)
+            console.log(activeMatches)
         })
 
         socket.on('dropAction', (data: DropAction) => {
@@ -77,11 +79,13 @@ function joinMatch(userID: string): Match {
     if (existingMatch) {
         existingMatch.addUserToGameBoard(userID)
         activeMatches.push(existingMatch)
+        console.log(existingMatch)
         return existingMatch
     }
     else {
         const newMatch = new Match([userID])
         matchQueue.push(newMatch)
+        console.log(newMatch)
         return newMatch
     }
 }

@@ -45,7 +45,7 @@ const listener = server.listen(listenAddress, () => {
 
 const io = new SocketServer(server, {
     cors: {
-        origin: "localhost:3000",
+        origin: "*",
         methods: ["GET", "POST"]
     }
 })

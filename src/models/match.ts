@@ -65,6 +65,10 @@ export class Match {
 
     addUserToGameBoard(userID: string) {
         this.gameBoard.usersides.push(this.initializeUserSide(userID))
+        this.users.push({
+            userID: userID,
+            scores: []
+        })
     }
 
     removeUserFromGameBoard(userID: string) {

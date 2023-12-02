@@ -41,6 +41,6 @@ export class ActionError extends Error {
 }
 
 export interface ReshuffleResponse {
-    userId: string,
+    userID: string,
     cards: Card[]
 }

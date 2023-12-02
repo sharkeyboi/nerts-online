@@ -14,12 +14,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="scores.length > 0" v-for="(user, index) in scores[0].map(elem => elem.userId)" class="border">
+                <tr v-if="scores.length > 0" v-for="(user, index) in scores[0].map(elem => elem.userID)" class="border">
                     <td class="border p-3 font-medium">
                         {{ user }}
                     </td>
                     <td v-for="(score, index) in scores" class="border p-3 text-end">
-                        {{ score.find((elem) => elem.userId == user)?.score }}
+                        {{ score.find((elem) => elem.userID == user)?.score }}
                     </td>
                 </tr>
             </tbody>

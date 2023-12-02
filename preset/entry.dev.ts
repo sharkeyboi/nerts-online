@@ -45,9 +45,10 @@ const listener = server.listen(listenAddress, () => {
 
 const io = new SocketServer(server, {
     cors: {
-        origin: "*",
+        origin: "localhost:3000",
         methods: ["GET", "POST"]
-    }
+    },
+    transports: ['websocket']
 })
 socketHandler(io);
 // Trap unhandled errors

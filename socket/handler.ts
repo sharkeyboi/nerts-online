@@ -28,10 +28,12 @@ let activeMatches: Match[] = []
 
 export const socketHandler = async (socketServer: Server<ClientToServerEvents, ServerToClientEvents>) => {
     socketServer.on('connection', (socket) => {
+        console.log(`User ${socket.handshake.auth.username} connected`)
         const username: string = socket.handshake.auth.username
+        socketServer.emit('message', `${username} has entered room`)
+        return
         let currMatch = joinMatch(username)
         socket.join(currMatch.roomID)
-        socketServer.to(currMatch.roomID).emit('message', `${username} has entered room: ${currMatch.roomID}`)
         const userSide = currMatch.gameBoard.usersides.find(x => x.userID == username)
         if (!userSide) {
             throw Error("Match not properly initialized")
@@ -53,7 +55,7 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
                 socketServer.to(currMatch.roomID).emit("dealResponse", username)
             } else {
                 socketServer.to(currMatch.roomID).emit("reshuffleResponse", {
-                    userId: username,
+                    userID: username,
                     cards: userSide.deck
                 })
             }

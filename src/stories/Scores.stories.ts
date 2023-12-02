@@ -24,18 +24,18 @@ type Story = StoryObj<typeof meta>;
 export const Show: Story = {
     args: {
         scores: [[{
-            userId: "Eric",
+            userID: "Eric",
             score: 10
         },
         {
-            userId: "Other",
+            userID: "Other",
             score: 20
         }], [{
-            userId: "Eric",
+            userID: "Eric",
             score: -2
         },
         {
-            userId: "Other",
+            userID: "Other",
             score: 49
         }]]
     }

@@ -114,11 +114,12 @@ $io.on('dropResponse', (dropResponse: DropResponse) => {
 })
 
 $io.on('dealResponse', (user) => {
+    console.log("Dealing for user")
     clientDeal(user)
 })
 
 $io.on('reshuffleResponse', (resp) => {
-    if (resp.userId == username.value) {
+    if (resp.userID == username.value) {
         playerDeck.value = resp.cards
         playerStack.value = []
     }
@@ -134,28 +135,28 @@ $io.on('roundEnd', (resp) => {
 })
 
 function clientHandleRiverDrop(dropResponse: DropResponse) {
-    const river = username.value == dropResponse.userId ? playerRiver.value : opponentRiver.value
+    const river = username.value == dropResponse.userID ? playerRiver.value : opponentRiver.value
     const dropTo = river[dropResponse.toLocation.index]
     dropResponse.cards.forEach((card) => {
         dropTo.push(card)
     })
 }
 function clientRemoveFromRiver(dropResponse: DropResponse) {
-    let river = username.value == dropResponse.userId ? playerRiver.value : opponentRiver.value
+    let river = username.value == dropResponse.userID ? playerRiver.value : opponentRiver.value
     let riverPile = river[dropResponse.fromLocation.index]
     dropResponse.cards.forEach((card) => {
         riverPile.splice(riverPile.indexOf(card), 1)
     })
 }
 function clientRemoveFromNerts(dropResponse: DropResponse) {
-    let nertsPile = username.value == dropResponse.userId ? playerNertsPile.value : opponentNertsPile.value
+    let nertsPile = username.value == dropResponse.userID ? playerNertsPile.value : opponentNertsPile.value
     dropResponse.cards.forEach((card) => {
         nertsPile.splice(nertsPile.indexOf(card), 1)
     })
 }
 
 function clientRemoveFromStack(dropResponse: DropResponse) {
-    let stack = username.value == dropResponse.userId ? playerStack.value : opponentStack.value
+    let stack = username.value == dropResponse.userID ? playerStack.value : opponentStack.value
     dropResponse.cards.forEach((card) => {
         stack.splice(stack.indexOf(card), 1)
     })
@@ -176,7 +177,7 @@ function clientHandleLakeDrop(dropResponse: DropResponse) {
 function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number) {
     console.log("DROPPING", clientDragAction)
     $io.emit('dropAction', {
-        userId: username.value,
+        userID: username.value,
         cards: clientDragAction.cards,
         toLocation: {
             locationType: LocationType.River,
@@ -188,7 +189,7 @@ function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number
 
 function serverHandleLakeDrop(clientDragAction: ClientDragAction, index: number) {
     $io.emit('dropAction', {
-        userId: username.value,
+        userID: username.value,
         cards: clientDragAction.cards,
         toLocation: {
             locationType: LocationType.Lake,

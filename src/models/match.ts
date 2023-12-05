@@ -18,25 +18,18 @@ const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
 //TODO Refactor scores into users property
 
 // TODO Scores don't work
-export interface MatchUser {
-    userID: string
-    scores: number[]
-}
 
 export class Match {
-    scores: Score[][]
     gameBoard: GameBoard
     roomID: string
-    users: MatchUser[]
+    users: string[]
+    scores: Score[][]
 
     constructor(users: string[]) {
-        this.scores = []
         this.roomID = v4()
-        this.users = users.map(user => ({
-            userID: user,
-            scores: []
-        }))
+        this.users = [...users]
         this.gameBoard = this.getNewGameBoard(this.users)
+        this.scores = []
     }
 
 
@@ -65,9 +58,9 @@ export class Match {
         return newUser
     }
 
-    private getNewGameBoard(users: MatchUser[]) {
+    private getNewGameBoard(users: string[]) {
         const gameBoard: GameBoard = {
-            usersides: users.map(user => this.initializeUserSide(user.userID)),
+            usersides: users.map(user => this.initializeUserSide(user)),
             lake: Array.from(Array(8), () => [])
         }
         return gameBoard
@@ -75,10 +68,7 @@ export class Match {
 
     addUserToGameBoard(userID: string) {
         this.gameBoard.usersides.push(this.initializeUserSide(userID))
-        this.users.push({
-            userID: userID,
-            scores: []
-        })
+        this.users.push(userID)
     }
 
     removeUserFromGameBoard(userID: string) {
@@ -87,7 +77,6 @@ export class Match {
 
     deal(userID: string): boolean {
         const userSide = this.getUserSide(userID)
-        console.log(userSide.deck)
         const dealtCards = userSide.deck.slice(0, 3)
         if (dealtCards.length == 0) {
             this.moveStackToDeck(userSide)
@@ -95,7 +84,6 @@ export class Match {
         }
         userSide.deck = userSide.deck.slice(dealtCards.length)
         userSide.stack = userSide.stack.concat(dealtCards)
-        console.log(userSide.stack)
         return true
     }
 
@@ -106,9 +94,7 @@ export class Match {
 
     drop(dropAction: DropAction): boolean {
         if (this.validateTake(dropAction)){
-            console.log("TAKE VALIDATED")
             if(this.validateDrop(dropAction)) {
-                console.log("DROP VALIDATED")
                 this.placeInLocation(dropAction.userID, dropAction.toLocation, dropAction.cards)
                 this.removeFromLocation(dropAction.userID, dropAction.fromLocation, dropAction.cards)
                 return true
@@ -146,7 +132,6 @@ export class Match {
                     const index = riverStack.indexOf(card)
                         riverStack.splice(index, 1)
                 })
-                console.log(riverStack)
                 break
             case (LocationType.Nerts):
                 const nertsStack = userSide.nertsPile
@@ -175,7 +160,6 @@ export class Match {
                 if (!userSide) return false
                 const riverStack = userSide.riverStacks[dropAction.toLocation.index]
                 if (!riverStack) return false
-                console.log(riverStack)
                 return validateRiverDrop(riverStack, dropAction.cards)
         }
         return false
@@ -184,28 +168,17 @@ export class Match {
     private validateTake(dropAction: DropAction): boolean {
         const userSide = this.getUserSide(dropAction.userID)
         if (!userSide) return false
-        console.log("USER SIDE EXISTS")
         switch (dropAction.fromLocation.locationType) {
             case (LocationType.River):
                 const riverStack = userSide.riverStacks[dropAction.fromLocation.index]
                 
                 if (!riverStack) return false
-                console.log("TAKING FROM RIVER")
-                console.log(riverStack)
-                console.log(dropAction.cards[0])
-                console.log(riverStack.includes(dropAction.cards[0]))
-                console.log(dropAction.cards.every(card => riverStack.some(item => item.number == card.number && item.suit == card.suit)))
                 return dropAction.cards.every(card => riverStack.some(item => item.number == card.number && item.suit == card.suit))
             case (LocationType.Nerts):
                 const nertsStack = userSide.nertsPile
                 return dropAction.cards.every(card => nertsStack.some(item => item.number == card.number && item.suit == card.suit))
             case (LocationType.Stack):
                 const stack = userSide.stack
-                console.log("Taking from Stack")
-                console.log(stack)
-                console.log(dropAction.cards[0])
-                console.log(stack.includes(dropAction.cards[0]))
-                console.log(dropAction.cards.every(card => stack.some(item => item.number == card.number && item.suit == card.suit)))
                 
                 return dropAction.cards.every(card => stack.some(item => item.number == card.number && item.suit == card.suit))
         }
@@ -225,7 +198,7 @@ export class Match {
         this.gameBoard.usersides.forEach((userSide) => {
             userSide.ready = false
             currScores.push({
-                userID: userID,
+                userID: userSide.userID,
                 score: userSide.points - (2 * userSide.nertsPile.length)
             })
         })

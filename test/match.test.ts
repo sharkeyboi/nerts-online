@@ -19,6 +19,7 @@ describe("match class", () => {
     })
     test("properly initialized", () => {
         expect(newMatch.scores).toEqual([])
+        expect(newMatch.gameBoard.usersides.length).toEqual(2)
         expect(newMatch.gameBoard.usersides[0].userID).toEqual("Eric")
         expect(newMatch.gameBoard.usersides[1].userID).toEqual("John")
     })
@@ -27,6 +28,8 @@ describe("match class", () => {
         expect(newMatch.gameBoard.usersides[2].userID).toEqual("Bob")
     })
     test("remove user from gameboard", () => {
+        console.log(newMatch.users)
+        expect(newMatch.gameBoard.usersides.length).toEqual(2)
         newMatch.removeUserFromGameBoard("Eric")
         expect(newMatch.gameBoard.usersides.length).toEqual(1)
     })

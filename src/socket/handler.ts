@@ -36,13 +36,10 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
 
             socketServer.to(currMatch.roomID).emit('matchError')
             activeMatches.splice(activeMatches.indexOf(currMatch), 1)
-            console.log(activeMatches)
         })
 
         socket.on('dropAction', (data: DropAction) => {
-            console.log(data)
             if (currMatch.drop(data)) {
-                console.log("DROPPING")
                 socketServer.to(currMatch.roomID).emit("dropResponse", data) // Return the updated state for the specific lake pile
             }
         })
@@ -64,13 +61,10 @@ export const socketHandler = async (socketServer: Server<ClientToServerEvents, S
         })
         socket.on('startRound', () => {
             currMatch.readyForStart(username)
-            if (currMatch.gameBoard.usersides.every(side => side.ready)) {
-                currMatch.resetBoard()
-                currMatch.gameBoard.usersides.forEach((asdf) => {
-                    console.log(asdf.deck)
-                })
-                socketServer.to(currMatch.roomID).emit("startGame", currMatch.gameBoard)
-            }
+            if(currMatch.users.length < 2) return
+            if(!currMatch.gameBoard.usersides.every(side => side.ready)) return
+            currMatch.resetBoard()
+            socketServer.to(currMatch.roomID).emit("startGame", currMatch.gameBoard)
         })
     })
 }
@@ -81,13 +75,11 @@ function joinMatch(userID: string): Match {
     if (existingMatch) {
         existingMatch.addUserToGameBoard(userID)
         activeMatches.push(existingMatch)
-        console.log(existingMatch)
         return existingMatch
     }
     else {
         const newMatch = new Match([userID])
         matchQueue.push(newMatch)
-        console.log(newMatch)
         return newMatch
     }
 }

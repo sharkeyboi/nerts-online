@@ -1,5 +1,5 @@
 <template>
-    <div :class="`border-2 border-slate-600 w-24 h-32 bg-slate-200 flex flex-col justify-between ${card ? 'cursor-pointer' : ''} select-none`"
+    <div v-if="!faceDown" :class="`border-2 border-slate-800 w-24 h-32 bg-slate-200 flex flex-col justify-between ${card ? 'cursor-pointer' : ''} select-none`"
         @dragover="dragoverHandler" @drop="dropHandler" @dragstart="dragStartHandler"
         :draggable="draggable ? 'true' : 'false'">
         <div class="left-0 top-0 flex flex-col w-6 text-center">
@@ -14,10 +14,14 @@
             </div>
         </div>
     </div>
+    <div v-else :class="`border-2 border-slate-800 w-24 h-32 bg-primary-400  select-none`">
+
+    </div>
 </template>
 
 
 <script setup lang="ts">
+import { PropType } from '#imports';
 import { Card } from '~/src/types/card';
 import { suitIcons, suitColors } from '~/src/utils/icons';
 const emit = defineEmits<{
@@ -25,10 +29,19 @@ const emit = defineEmits<{
     (event: 'drag', dragEvent: DragEvent): void
 }>()
 
-const props = defineProps<{
-    card: Card,
-    draggable: boolean
-}>()
+const props = defineProps({
+    card: {
+        type: Object as PropType<Card>,
+        required: true
+    },
+    draggable: {
+        type: Boolean
+    },
+    faceDown: {
+        type: Boolean,
+        default: false
+    }
+})
 
 function dropHandler(event: DragEvent) {
     emit("drop", event)

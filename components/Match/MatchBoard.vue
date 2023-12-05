@@ -1,6 +1,6 @@
 <template>
-    {{ username }}
     <div class=" flex flex-col justify-evenly h-full">
+        <div class="text-center text-xl text-primary-500">{{ opponentName }}</div>
         <div class=" rotate-180 flex justify-evenly">
             <MatchNertsPile :draggable="false" :cards="opponentNertsPile" />
             <div class="flex justify-between">
@@ -23,6 +23,7 @@
             <MatchRiverStack :draggable="true" @drop="serverHandleRiverDrop($event, index)" :cards="cards"
                 v-for="(cards, index) in playerRiver" :key="index" :index="index" />
         </div>
+        <div class="text-center text-xl text-primary-500">{{ username }}</div>
     </div>
     <UtilsModal :show="showScores">
         <Scores @close="serverStartRound" :scores="currScores" />
@@ -58,6 +59,7 @@ const opponentRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 const showScores = ref(true)
 const username = useState('username', () => "")
 const currScores: Ref<Score[][]> = ref([])
+const opponentName: Ref<string> = ref("")
 const { $io } = useNuxtApp()
 $io.auth = {
     username: username.value
@@ -70,7 +72,6 @@ $io.on('message', (msg) => {
 //     console.log(users)
 // })
 $io.on('startGame', (gameBoard: GameBoard) => {
-    console.log(gameBoard)
     gameBoard.usersides.forEach((currUserSide) => {
         if (currUserSide.userID == username.value) {
             playerNertsPile.value = currUserSide.nertsPile
@@ -79,6 +80,7 @@ $io.on('startGame', (gameBoard: GameBoard) => {
             playerStack.value = []
         }
         else {
+            opponentName.value = currUserSide.userID
             opponentNertsPile.value = currUserSide.nertsPile
             opponentRiver.value = currUserSide.riverStacks
             opponentDeck.value = currUserSide.deck
@@ -117,7 +119,6 @@ $io.on('dropResponse', (dropResponse: DropResponse) => {
 })
 
 $io.on('dealResponse', (user) => {
-    console.log("Dealing for user")
     clientDeal(user)
 })
 
@@ -178,7 +179,6 @@ function clientHandleLakeDrop(dropResponse: DropResponse) {
 
 
 function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number) {
-    console.log("DROPPING", clientDragAction)
     $io.emit('dropAction', {
         userID: username.value,
         cards: clientDragAction.cards,

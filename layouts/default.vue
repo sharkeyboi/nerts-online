@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col w-full h-screen bg-slate-50 align-middle">
     <AppHeader />
-    <main class="flex-grow h-full bg-slate-200 flex justify-center">
+    <main class="flex-grow bg-slate-200 flex justify-center">
       <slot />
     </main>
     <footer class="flex items-center justify-center w-full h-16 text-black">

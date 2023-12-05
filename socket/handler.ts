@@ -1,27 +1,11 @@
-import { Server, Socket } from "socket.io";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { v4 } from "uuid";
-import { Match } from "../models/match";
-import { validateLakeDrop, validateRiverDrop } from "../serverDropHandlers";
-import { DropAction, LocationType } from "../types/actions";
-import { GameBoard, UserSide } from "../types/board";
-import { Card } from "../types/card";
-import { ClientToServerEvents, Room, Score, ServerToClientEvents } from "../types/socketMessages";
-import { cartesian, numbers, suits } from "../utils/cardData";
-import { shuffle } from "../utils/shuffle";
+import { Server,} from "socket.io";
+import { Match } from "../src/models/match";
+import { DropAction} from "../src/types/actions";
+import { ClientToServerEvents, ServerToClientEvents } from "../src/types/socketMessages";
 
 
 const MAX_USERS = 2
 
-
-
-
-const deckOfCards: Card[] = cartesian(numbers, suits).map((elem: any[]) => {
-    return {
-        number: elem[0],
-        suit: elem[1]
-    }
-})
 
 let matchQueue: Match[] = []
 let activeMatches: Match[] = []

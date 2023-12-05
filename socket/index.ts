@@ -3,6 +3,10 @@ import {  Server } from "socket.io";
 import { socketHandler } from './handler';
 
 export function startSocketServer (nuxtServer: NuxtServer) {
-  const io = new Server(nuxtServer)
+  const io = new Server(nuxtServer, {
+    cors: {
+      origin: ["*"]
+    }
+  })
   socketHandler(io)
 };

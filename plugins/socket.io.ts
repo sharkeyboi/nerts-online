@@ -6,9 +6,7 @@ export default defineNuxtPlugin(() => {
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(runtimeConfig.public.socketURL, {
         autoConnect: false,
         multiplex: false,
-        transports: ['websocket']
     })
-
     return {
         provide: {
             io: socket

@@ -8,7 +8,7 @@ import destr from "destr";
 import { toNodeListener } from "h3";
 import { trapUnhandledNodeErrors } from "#internal/nitro/utils";
 import { setupGracefulShutdown } from "#internal/nitro/shutdown";
-import { socketHandler } from "~/src/socket/handler";
+import { socketHandler } from "../socket/handler";
 const nitroApp = useNitroApp();
 
 const cert = process.env.NITRO_SSL_CERT;
@@ -47,9 +47,8 @@ const listener = server.listen(path ? { path } : { port, host }, (err) => {
 });
 const io = new SocketServer(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
+        origin: "*"
+    },
 })
 socketHandler(io);
 // Trap unhandled errors

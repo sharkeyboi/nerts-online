@@ -1,4 +1,4 @@
-import { startSocketServer } from "./socket/index";
+
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({

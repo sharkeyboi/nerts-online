@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
     const runtimeConfig = useRuntimeConfig()
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(runtimeConfig.public.socketURL, {
         autoConnect: false,
-        multiplex: false,
+        
     })
     return {
         provide: {

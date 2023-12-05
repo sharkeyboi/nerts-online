@@ -45,9 +45,8 @@ const listener = server.listen(listenAddress, () => {
 
 const io = new SocketServer(server, {
     cors: {
-        origin: "localhost:3000",
-        methods: ["GET", "POST"]
-    }
+        origin: "*",
+    },
 })
 socketHandler(io);
 // Trap unhandled errors

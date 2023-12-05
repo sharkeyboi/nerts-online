@@ -2,7 +2,7 @@ import { Suit } from "../src/types/card";
 import { validateRiverDrop } from "../src/serverDropHandlers";
 
 
-describe('river drop validation', () => {
+describe('validateRiverDrop()', () => {
     test('opposite suit, one lower number succeeds', () => {
         expect(validateRiverDrop([{
             suit: Suit.Heart,

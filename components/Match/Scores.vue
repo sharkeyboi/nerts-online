@@ -1,8 +1,8 @@
 <template>
     <div class="ma-4">
 
-        <h1 class="text-center tracking-tight text-4xl mb-8 text-slate-600">Round over</h1>
-        <table class="border-collapse border w-full">
+        <h1 class="text-center tracking-tight text-4xl mb-8 text-slate-600">{{props.scores.length ? 'Round over' : 'Get ready'}}</h1>
+        <table v-if="props.scores.length" class="border-collapse border w-full">
             <thead>
                 <tr>
                     <th class="border p-3 bg-primary-200">
@@ -14,17 +14,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="scores.length > 0" v-for="(user, index) in scores[0].map(elem => elem.userId)" class="border">
+                <tr v-if="scores.length > 0" v-for="(user, index) in scores[0].map(elem => elem.userID)" class="border">
                     <td class="border p-3 font-medium">
                         {{ user }}
                     </td>
                     <td v-for="(score, index) in scores" class="border p-3 text-end">
-                        {{ score.find((elem) => elem.userId == user)?.score }}
+                        {{ score.find((elem) => elem.userID == user)?.score }}
                     </td>
                 </tr>
             </tbody>
         </table>
-        <UtilsButton class="mt-4" label="Next Round" @click="emit('close')" />
+        <UtilsButton class="mt-4" :label="props.scores.length? 'Next round' : 'Start Match'" @click="emit('close')" />
     </div>
 </template>
 

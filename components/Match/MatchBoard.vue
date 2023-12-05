@@ -1,6 +1,6 @@
 <template>
-    {{ username }}
     <div class=" flex flex-col justify-evenly h-full">
+        <div class="text-center text-xl text-primary-500">{{ opponentName }}</div>
         <div class=" rotate-180 flex justify-evenly">
             <MatchNertsPile :draggable="false" :cards="opponentNertsPile" />
             <div class="flex justify-between">
@@ -23,6 +23,7 @@
             <MatchRiverStack :draggable="true" @drop="serverHandleRiverDrop($event, index)" :cards="cards"
                 v-for="(cards, index) in playerRiver" :key="index" :index="index" />
         </div>
+        <div class="text-center text-xl text-primary-500">{{ username }}</div>
     </div>
     <UtilsModal :show="showScores">
         <Scores @close="serverStartRound" :scores="currScores" />
@@ -47,6 +48,7 @@ const playerNertsPile: Ref<Card[]> = ref([])
 const playerDeck: Ref<Card[]> = ref([])
 const playerStack: Ref<Card[]> = ref([])
 const playerRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
+
 const lake: Ref<Card[][]> = ref(Array.from(Array(8), () => []))
 
 const opponentNertsPile: Ref<Card[]> = ref([])
@@ -54,9 +56,10 @@ const opponentDeck: Ref<Card[]> = ref([])
 const opponentStack: Ref<Card[]> = ref([])
 const opponentRiver: Ref<Card[][]> = ref(Array.from(Array(5), () => []))
 
-const showScores = ref(false)
+const showScores = ref(true)
 const username = useState('username', () => "")
 const currScores: Ref<Score[][]> = ref([])
+const opponentName: Ref<string> = ref("")
 const { $io } = useNuxtApp()
 $io.auth = {
     username: username.value
@@ -69,19 +72,18 @@ $io.on('message', (msg) => {
 //     console.log(users)
 // })
 $io.on('startGame', (gameBoard: GameBoard) => {
-    console.log(gameBoard)
-    Object.keys(gameBoard.usersides).forEach((currUser) => {
-        const userSide = gameBoard.usersides[currUser]
-        if (currUser == username.value) {
-            playerNertsPile.value = userSide.nertsPile
-            playerRiver.value = userSide.riverStacks
-            playerDeck.value = userSide.deck
+    gameBoard.usersides.forEach((currUserSide) => {
+        if (currUserSide.userID == username.value) {
+            playerNertsPile.value = currUserSide.nertsPile
+            playerRiver.value = currUserSide.riverStacks
+            playerDeck.value = currUserSide.deck
             playerStack.value = []
         }
         else {
-            opponentNertsPile.value = userSide.nertsPile
-            opponentRiver.value = userSide.riverStacks
-            opponentDeck.value = userSide.deck
+            opponentName.value = currUserSide.userID
+            opponentNertsPile.value = currUserSide.nertsPile
+            opponentRiver.value = currUserSide.riverStacks
+            opponentDeck.value = currUserSide.deck
             opponentStack.value = []
         }
         lake.value = Array.from(Array(8), () => [])
@@ -109,8 +111,10 @@ $io.on('dropResponse', (dropResponse: DropResponse) => {
             break;
         case (LocationType.Nerts):
             clientRemoveFromNerts(dropResponse)
+            break;
         case (LocationType.Stack):
             clientRemoveFromStack(dropResponse)
+            break;
     }
 })
 
@@ -119,7 +123,7 @@ $io.on('dealResponse', (user) => {
 })
 
 $io.on('reshuffleResponse', (resp) => {
-    if (resp.userId == username.value) {
+    if (resp.userID == username.value) {
         playerDeck.value = resp.cards
         playerStack.value = []
     }
@@ -135,28 +139,28 @@ $io.on('roundEnd', (resp) => {
 })
 
 function clientHandleRiverDrop(dropResponse: DropResponse) {
-    const river = username.value == dropResponse.userId ? playerRiver.value : opponentRiver.value
+    const river = username.value == dropResponse.userID ? playerRiver.value : opponentRiver.value
     const dropTo = river[dropResponse.toLocation.index]
     dropResponse.cards.forEach((card) => {
         dropTo.push(card)
     })
 }
 function clientRemoveFromRiver(dropResponse: DropResponse) {
-    let river = username.value == dropResponse.userId ? playerRiver.value : opponentRiver.value
+    let river = username.value == dropResponse.userID ? playerRiver.value : opponentRiver.value
     let riverPile = river[dropResponse.fromLocation.index]
     dropResponse.cards.forEach((card) => {
         riverPile.splice(riverPile.indexOf(card), 1)
     })
 }
 function clientRemoveFromNerts(dropResponse: DropResponse) {
-    let nertsPile = username.value == dropResponse.userId ? playerNertsPile.value : opponentNertsPile.value
+    let nertsPile = username.value == dropResponse.userID ? playerNertsPile.value : opponentNertsPile.value
     dropResponse.cards.forEach((card) => {
         nertsPile.splice(nertsPile.indexOf(card), 1)
     })
 }
 
 function clientRemoveFromStack(dropResponse: DropResponse) {
-    let stack = username.value == dropResponse.userId ? playerStack.value : opponentStack.value
+    let stack = username.value == dropResponse.userID ? playerStack.value : opponentStack.value
     dropResponse.cards.forEach((card) => {
         stack.splice(stack.indexOf(card), 1)
     })
@@ -175,9 +179,8 @@ function clientHandleLakeDrop(dropResponse: DropResponse) {
 
 
 function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number) {
-    console.log("DROPPING", clientDragAction)
     $io.emit('dropAction', {
-        userId: username.value,
+        userID: username.value,
         cards: clientDragAction.cards,
         toLocation: {
             locationType: LocationType.River,
@@ -189,7 +192,7 @@ function serverHandleRiverDrop(clientDragAction: ClientDragAction, index: number
 
 function serverHandleLakeDrop(clientDragAction: ClientDragAction, index: number) {
     $io.emit('dropAction', {
-        userId: username.value,
+        userID: username.value,
         cards: clientDragAction.cards,
         toLocation: {
             locationType: LocationType.Lake,

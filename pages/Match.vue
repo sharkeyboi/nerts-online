@@ -1,7 +1,7 @@
 <template>
-    <div class=" bg-green-600 w-full">
+    <div class=" w-full">
 
-        <MatchBoard class=" bg-green-600" />
+        <MatchBoard  />
     </div>
 </template>
 

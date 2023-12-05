@@ -25,7 +25,6 @@ function dropHandler(event: DragEvent) {
     const data = event.dataTransfer?.getData('text/plain')
     if (data) {
         const clientDragAction: ClientDragAction = JSON.parse(data)
-        console.log(clientDragAction)
         // You're only allowed to drop cards one at a time in the lake
         if (clientDragAction.cards.length == 1) {
             emit("drop", clientDragAction)

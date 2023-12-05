@@ -40,7 +40,6 @@ function dropHandler(event: DragEvent) {
     const data = event.dataTransfer?.getData('text/plain')
     if (data) {
         const clientDragAction: ClientDragAction = JSON.parse(data)
-        console.log(clientDragAction)
         emit("drop", clientDragAction)
     }
 }

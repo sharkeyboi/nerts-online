@@ -9,7 +9,7 @@ import { toNodeListener } from "h3";
 const nitroApp = useNitroApp();
 import { trapUnhandledNodeErrors } from "#internal/nitro/utils";
 import { Server as SocketServer } from "socket.io";
-import { socketHandler } from "~/socket/handler";
+import { socketHandler } from "~/src/socket/handler";
 
 const server = new Server(toNodeListener(nitroApp.h3App));
 
@@ -47,7 +47,8 @@ const io = new SocketServer(server, {
     cors: {
         origin: "localhost:3000",
         methods: ["GET", "POST"]
-    }
+    },
+    transports: ['websocket']
 })
 socketHandler(io);
 // Trap unhandled errors

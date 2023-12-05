@@ -1,3 +1,5 @@
+import { startSocketServer } from "./src/socket/index";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: false },
@@ -16,13 +18,14 @@ export default defineNuxtConfig({
     cssPath: '~/assets/tailwind.css',
     injectPosition: 'last',
   },
-  nitro: {
-    entry: process.env.NODE_ENV == 'production' ? undefined : "../preset/entry.dev",
-    preset: "./preset",
-  },
+  // nitro: {
+  //   entry: process.env.NODE_ENV == 'production' ? undefined : "../preset/entry.dev",
+  //   preset: "./preset",
+  // },
   runtimeConfig: {
     public: {
       socketURL: process.env.SOCKET_URL
     }
-  }
+  },
+  hooks: {listen: (server) => startSocketServer(server)}
 })

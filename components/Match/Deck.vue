@@ -1,6 +1,6 @@
 <template>
     <div @click="emit('click')"
-        :class="`border-4 border-slate-700 w-24 h-32 cursor-pointer select-none ${cards.length > 0 ? 'bg-slate-500' : ''}`">
+        :class="`border-2 border-slate-800 w-24 h-32 cursor-pointer select-none ${cards.length > 0 ? 'bg-primary-400' : ''}`">
 
     </div>
 </template>
